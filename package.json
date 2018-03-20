@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -17,6 +18,7 @@
   },
   "homepage": "https://github.com/chasfricke/capstone-BE#readme",
   "dependencies": {
+    "cors": "^2.8.4",
     "express": "^4.16.3",
     "knex": "^0.14.4",
     "pg": "^7.4.1"
