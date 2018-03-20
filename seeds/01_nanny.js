@@ -3,6 +3,7 @@ exports.seed = function(knex, Promise) {
   // Deletes ALL existing entries
   return knex('nanny_acct_info').del()
     .then(function () {
+      console.log("1st function")
       // Inserts seed entries
       return knex('nanny_acct_info').insert([
         {id: 1, first_name: 'Kate', last_name: 'Johnson', background: 'I have led backpacking trips across the US for the last 5 years.', photo_url: 'https://randomuser.me/api/portraits/women/28.jpg'},
@@ -11,6 +12,7 @@ exports.seed = function(knex, Promise) {
       ]);
     })
     .then (() => {
-      return knex.raw('ALTER SEQUENCE nanny_acct_info_seq RESTART WITH 4;')
+      console.log("2nd function")
+      return knex.raw('ALTER SEQUENCE nanny_acct_info_id_seq RESTART WITH 4;')
     })
 };
