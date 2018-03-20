@@ -12,7 +12,6 @@ exports.seed = function(knex, Promise) {
       ]);
     })
     .then (() => {
-      console.log("2nd function")
       return knex.raw('ALTER SEQUENCE nanny_acct_info_id_seq RESTART WITH 4;')
     })
 };
