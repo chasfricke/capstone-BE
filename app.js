@@ -2,6 +2,7 @@ const express = require('express')
 const app = express()
 const cors = require('cors')
 const queries = require('./queries')
+const queries_family = require('./queries_family')
 const bodyParser = require('body-parser')
 const database = require('./database-connection')
 const nodemailer = require('nodemailer')
@@ -15,9 +16,13 @@ app.use(morgan(process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'))
 
 
 app.get('/', (request, response) => {
-    queries.list('nanny_account_info').catch(console.error)
+    queries
+      .list('nanny_account_info')
+      .catch(next)
   })
-  
+
+//nanny_account_info
+
   app.get('/nanny_account_info', (request, response, next) => {
     queries
       .list('nanny_account_info')
@@ -63,6 +68,53 @@ app.get('/', (request, response) => {
       .catch(next)
   })
   
+//family_account_info
+
+app.get('/family_account_info', (request, response, next) => {
+  queries_family
+    .list('family_account_info')
+    .then(family_account_info => {
+      response.json({ family_account_info })
+    })
+    .catch(next)
+})
+
+app.get('/family_account_info/:id', (request, response, next) => {
+  queries_family
+    .read('family_account_info', request.params.id)
+    .then(family_account_info => {
+      family_account_info ? response.json({ family_account_info }) : response.sendStatus(404)
+    })
+    .catch(next)
+})
+
+app.post('/family_account_info', (request, response, next) => {
+  queries_family
+    .create('family_account_info', request.body)
+    .then(family_account_info => {
+      response.status(201).json({ family_account_info: family_account_info })
+    })
+    .catch(next)
+})
+
+app.delete('/family_account_info/:id', (request, response, next) => {
+  queries_family
+    .delete('family_account_info', request.params.id)
+    .then(() => {
+      response.sendStatus(204)
+    })
+    .catch(next)
+})
+
+app.put('/family_account_info/:id', (request, response, next) => {
+  queries_family
+    .update('family_account_info', request.params.id, request.body)
+    .then(family_account_info => {
+      response.json({ family_account_info: family_account_info[0] })
+    })
+    .catch(next)
+})
+
 
 //Nodemailer
 
