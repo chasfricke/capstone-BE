@@ -5,70 +5,70 @@ const queries = require('./queries')
 const bodyParser = require('body-parser')
 const database = require('./database-connection')
 const nodemailer = require('nodemailer')
+const xoauth2 = require('xoauth2')
+const morgan = require('morgan')
 
 app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(morgan(process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'))
 
 
 app.get('/', (request, response) => {
     queries.list('nanny_account_info').catch(console.error)
   })
   
-  app.get('/nanny_account_info', (request, response) => {
+  app.get('/nanny_account_info', (request, response, next) => {
     queries
       .list('nanny_account_info')
       .then(nanny_account_info => {
         response.json({ nanny_account_info })
       })
-      .catch(console.error)
+      .catch(next)
   })
   
-  app.get('/nanny_account_info/:id', (request, response) => {
+  app.get('/nanny_account_info/:id', (request, response, next) => {
     queries
       .read('nanny_account_info', request.params.id)
       .then(nanny_account_info => {
         nanny_account_info ? response.json({ nanny_account_info }) : response.sendStatus(404)
       })
-      .catch(console.error)
+      .catch(next)
   })
   
-  app.post('/nanny_account_info', (request, response) => {
+  app.post('/nanny_account_info', (request, response, next) => {
     queries
       .create('nanny_account_info', request.body)
       .then(nanny_account_info => {
         response.status(201).json({ nanny_account_info: nanny_account_info })
       })
-      .catch(console.error)
+      .catch(next)
   })
   
-  app.delete('/nanny_account_info/:id', (request, response) => {
+  app.delete('/nanny_account_info/:id', (request, response, next) => {
     queries
       .delete('nanny_account_info', request.params.id)
       .then(() => {
         response.sendStatus(204)
       })
-      .catch(console.error)
+      .catch(next)
   })
   
-  app.put('/nanny_account_info/:id', (request, response) => {
+  app.put('/nanny_account_info/:id', (request, response, next) => {
     queries
       .update('nanny_account_info', request.params.id, request.body)
       .then(nanny_account_info => {
         response.json({ nanny_account_info: nanny_account_info[0] })
       })
-      .catch(console.error)
+      .catch(next)
   })
   
-  app.use((request, response) => {
-    response.sendStatus(404)
-  })
 
-  //Nodemailer
+//Nodemailer
 
-  app.post('/api/form', (request, response) => {
+  app.post('/api/form', (request, response, next) => {
     nodemailer.createTestAccount((err, account) => {
-        const htmlEmail = `
+      const htmlEmail = `
             <h3>Contact Details</h3>
             <ul>
                 <li>Name: ${request.body.user_name}</li>
@@ -88,24 +88,42 @@ app.get('/', (request, response) => {
         })
 
         let mailOptions = {
-            from: 'test@testaccount.com',
-            to: 'ssvw2yzwjvwdryyb@ethereal.email',
-            replyTo: 'test@testaccount.com',
-            subject: 'new message',
+            from: request.body.user_email,
+            to: request.body.nannyData.email_address,
+            replyTo: request.body.user_email,
+            subject: request.body.user_subject,
             text: request.body.user_message,
             html: htmlEmail    
         }
 
         transporter.sendMail(mailOptions, (err, info) => {
             if (err) {
-                return console.log(err)
+                return next(err)
             }
             console.log('Message sent: %s', info.message)
             console.log('Message URL: %s', nodemailer.getTestMessageUrl(info))
+            response.send(info)
         })
     })
 })
 
+// These 2 `app.use` MUST be last `.use`'s
+app.use(notFound)
+app.use(errorHandler)
 
+function notFound(req, res, next) {
+  const url = req.originalUrl
+  if (!/favicon\.ico$/.test(url) && !/robots\.txt$/.test(url)) {
+    // Don't log less important (automatic) browser requests
+    console.error('[404: Requested file not found] ', url)
+  }
+  res.status(404).send({error: 'Url not found', status: 404, url})
+}
+
+function errorHandler(err, req, res, next) {
+  console.error('ERROR', err)
+  const stack =  process.env.NODE_ENV !== 'production' ? err.stack : undefined
+  res.status(500).send({error: err.message, stack, url: req.originalUrl})
+}
 
 module.exports = app
