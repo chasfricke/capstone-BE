@@ -1,4 +1,4 @@
-const database = require('./database-connection')
+const database = require('../database-connection')
 
 module.exports = {
   list(family_acct_info) {
@@ -10,7 +10,7 @@ module.exports = {
       .where('id', id)
       .first()
   },
-  create(family_account_info, item) {
+  create(item) {
     return database('family_account_info')
       .insert(item)
       .returning('*')
@@ -28,4 +28,16 @@ module.exports = {
       .delete()
       .where('id', id)
   }
+  //*** auth logic (user.js) ***
+  // getOne: function (id) {
+  //   return knex('family_account_info').where('id', id).first();
+  // },
+  // getOneByEmail: function (email) {
+  //   return knex('family_account_info').where('email', email).first();
+  // },
+  // create: function(user) {
+  //   return knex('family_account_info').insert(user, 'id').then(ids => {
+  //     return ids[0];
+  //   });
+  // }
 }

@@ -1,13 +1,13 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const queries = require('./queries')
-const queries_family = require('./queries_family')
+const queries = require('./db/queries')
+const queries_family = require('./db/queries_family')
 const bodyParser = require('body-parser')
 const database = require('./database-connection')
 const nodemailer = require('nodemailer')
-const xoauth2 = require('xoauth2')
 const morgan = require('morgan')
+const cookieParser = require('cookie-parser');
 
 app.use(cors())
 app.use(bodyParser.json())
@@ -90,7 +90,7 @@ app.get('/family_account_info/:id', (request, response, next) => {
 
 app.post('/family_account_info', (request, response, next) => {
   queries_family
-    .create('family_account_info', request.body)
+    .create(request.body)
     .then(family_account_info => {
       response.status(201).json({ family_account_info: family_account_info })
     })
@@ -160,6 +160,7 @@ app.put('/family_account_info/:id', (request, response, next) => {
 })
 
 // These 2 `app.use` MUST be last `.use`'s
+// DL helped with these
 app.use(notFound)
 app.use(errorHandler)
 
@@ -178,4 +179,4 @@ function errorHandler(err, req, res, next) {
   res.status(500).send({error: err.message, stack, url: req.originalUrl})
 }
 
-module.exports = app
+module.exports = app;
