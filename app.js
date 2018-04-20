@@ -3,13 +3,14 @@ const cors = require('cors')
 const queries = require('./db/queries')
 const queries_family = require('./db/queries_family')
 const bodyParser = require('body-parser')
-const database = require('./database-connection')
+const database = require('./db/database-connection')
 const nodemailer = require('nodemailer')
 const morgan = require('morgan')
 const cookieParser = require('cookie-parser')
 
 const nannies = require('./routes/nanny_account_info')
 const families = require('./routes/family_account_info')
+const index = require('./auth/index')
 
 const app = express()
 
@@ -20,6 +21,7 @@ app.use(morgan(process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'))
 
 app.use('/nanny_account_info', nannies)
 app.use('/family_account_info', families)
+app.use('/', index)
 
 //Nodemailer
   app.post('/api/form', (request, response, next) => {
