@@ -1,5 +1,4 @@
 const express = require('express')
-const app = express()
 const cors = require('cors')
 const queries = require('./db/queries')
 const queries_family = require('./db/queries_family')
@@ -7,117 +6,22 @@ const bodyParser = require('body-parser')
 const database = require('./database-connection')
 const nodemailer = require('nodemailer')
 const morgan = require('morgan')
-const cookieParser = require('cookie-parser');
+const cookieParser = require('cookie-parser')
+
+const nannies = require('./routes/nanny_account_info')
+const families = require('./routes/family_account_info')
+
+const app = express()
 
 app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
 app.use(morgan(process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'))
 
-
-app.get('/', (request, response) => {
-    queries
-      .list('nanny_account_info')
-      .catch(next)
-  })
-
-//nanny_account_info
-
-  app.get('/nanny_account_info', (request, response, next) => {
-    queries
-      .list('nanny_account_info')
-      .then(nanny_account_info => {
-        response.json({ nanny_account_info })
-      })
-      .catch(next)
-  })
-  
-  app.get('/nanny_account_info/:id', (request, response, next) => {
-    queries
-      .read('nanny_account_info', request.params.id)
-      .then(nanny_account_info => {
-        nanny_account_info ? response.json({ nanny_account_info }) : response.sendStatus(404)
-      })
-      .catch(next)
-  })
-  
-  app.post('/nanny_account_info', (request, response, next) => {
-    queries
-      .create('nanny_account_info', request.body)
-      .then(nanny_account_info => {
-        response.status(201).json({ nanny_account_info: nanny_account_info })
-      })
-      .catch(next)
-  })
-  
-  app.delete('/nanny_account_info/:id', (request, response, next) => {
-    queries
-      .delete('nanny_account_info', request.params.id)
-      .then(() => {
-        response.sendStatus(204)
-      })
-      .catch(next)
-  })
-  
-  app.put('/nanny_account_info/:id', (request, response, next) => {
-    queries
-      .update('nanny_account_info', request.params.id, request.body)
-      .then(nanny_account_info => {
-        response.json({ nanny_account_info: nanny_account_info[0] })
-      })
-      .catch(next)
-  })
-  
-//family_account_info
-
-app.get('/family_account_info', (request, response, next) => {
-  queries_family
-    .list('family_account_info')
-    .then(family_account_info => {
-      response.json({ family_account_info })
-    })
-    .catch(next)
-})
-
-app.get('/family_account_info/:id', (request, response, next) => {
-  queries_family
-    .read('family_account_info', request.params.id)
-    .then(family_account_info => {
-      family_account_info ? response.json({ family_account_info }) : response.sendStatus(404)
-    })
-    .catch(next)
-})
-
-app.post('/family_account_info', (request, response, next) => {
-  queries_family
-    .create(request.body)
-    .then(family_account_info => {
-      response.status(201).json({ family_account_info: family_account_info })
-    })
-    .catch(next)
-})
-
-app.delete('/family_account_info/:id', (request, response, next) => {
-  queries_family
-    .delete('family_account_info', request.params.id)
-    .then(() => {
-      response.sendStatus(204)
-    })
-    .catch(next)
-})
-
-app.put('/family_account_info/:id', (request, response, next) => {
-  queries_family
-    .update('family_account_info', request.params.id, request.body)
-    .then(family_account_info => {
-      response.json({ family_account_info: family_account_info[0] })
-    })
-    .catch(next)
-})
-
+app.use('/nanny_account_info', nannies)
+app.use('/family_account_info', families)
 
 //Nodemailer
-
   app.post('/api/form', (request, response, next) => {
     nodemailer.createTestAccount((err, account) => {
       const htmlEmail = `
@@ -160,7 +64,6 @@ app.put('/family_account_info/:id', (request, response, next) => {
 })
 
 // These 2 `app.use` MUST be last `.use`'s
-// DL helped with these
 app.use(notFound)
 app.use(errorHandler)
 

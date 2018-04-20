@@ -1,4 +1,4 @@
-// Route paths are prepended with /auth
+// Route paths are prepended with /queries_family
 const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
