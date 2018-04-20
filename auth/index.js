@@ -3,7 +3,7 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const router = express.Router();
 
-const User = require('../queries_family');
+const User = require('../db/queries_family');
 
 router.get('/', (req, res) => {
     res.json({
@@ -45,10 +45,6 @@ router.post('/signup', (req, res, next) => {
                                     message: 'valid user'
                                 });
                             });
-
-                        // redirect
-                        
-                    // Store hash in your password DB.
                     });
                     
                 } else {
@@ -74,12 +70,12 @@ router.post('/login', (req, res, next) => {
                     .then((result) => {
                     if (result) {
                         // setting the 'set-cookie' header 
-                        const isSecure = req.app.get('env') != 'development';
-                        res.cookie('user_id', user.id, {
-                            httpOnly: true,
-                            secure: isSecure,
-                            signed: true
-                        });
+                        // const isSecure = req.app.get('env') != 'development';
+                        // res.cookie('user_id', user.id, {
+                        //     httpOnly: true,
+                        //     secure: isSecure,
+                        //     signed: true
+                        // });
                         res.json({
                             message: 'Logged in!'
                         });

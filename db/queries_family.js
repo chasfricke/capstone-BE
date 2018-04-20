@@ -1,4 +1,4 @@
-const database = require('../database-connection')
+const database = require('./database-connection')
 
 module.exports = {
   list(family_acct_info) {
@@ -27,7 +27,18 @@ module.exports = {
     return database('family_account_info')
       .delete()
       .where('id', id)
+  },
+
+  //from /auth/index.js
+  getOneByEmail: function (email) {
+    return database('family_account_info').where('email_address', email).first();
   }
+
+ 
+
+
+
+
   //*** auth logic (user.js) ***
   // getOne: function (id) {
   //   return knex('family_account_info').where('id', id).first();
