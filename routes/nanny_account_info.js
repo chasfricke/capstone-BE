@@ -1,3 +1,5 @@
+//all routes prepended with /nanny_account_info
+
 const express = require('express');
 const router = express.Router();
 const queries = require('../db/queries');

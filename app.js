@@ -17,6 +17,7 @@ const app = express()
 app.use(cors())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: false }))
+app.use(cookieParser(process.env.COOKIE_SECRET));
 app.use(morgan(process.env.NODE_ENV !== 'production' ? 'dev' : 'combined'))
 
 app.use('/nanny_account_info', nannies)
