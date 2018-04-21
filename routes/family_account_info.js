@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const queries_family = require('../db/queries_family');
+//all routes prepended with /family_account_info
 
 router.get('/', (request, response, next) => {
     queries_family
